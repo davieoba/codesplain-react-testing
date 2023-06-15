@@ -1,39 +1,24 @@
 import { render, screen } from '@testing-library/react'
-import { rest } from 'msw'
-import { setupServer } from 'msw/node'
 import { MemoryRouter } from 'react-router'
 import HomeRoute from './HomeRoute'
+import { createServer } from '../tests/server'
 
-const handlers = [
-  rest.get('/api/repositories', (req, res, ctx) => {
-    const query = req.url.searchParams.get('q').split('language:')[1]
 
-    // the actual data in the real repo is about 10, I am just simulating 2
-    return res(ctx.json({
-      items: [
-        { id: 1, full_name: `${query}_one` },
-        { id: 2, full_name: `${query}_two` }
-      ]
-    }))
-  })
-]
+createServer([
+  {
+    path: '/api/repositories',
+    res: (req, res, ctx) => {
+      const query = req.url.searchParams.get('q').split('language:')[1]
 
-const server = setupServer(...handlers)
-
-// execute one time before all the test in this file
-beforeAll(() => {
-  server.listen()
-})
-
-// run the code after each test exection in this file
-afterEach(() => {
-  server.resetHandlers()
-})
-
-// run after all the test in this file has been executed
-afterAll(() => {
-  server.close()
-})
+      return ({
+        items: [
+          { id: 1, full_name: `${query}_one` },
+          { id: 2, full_name: `${query}_two` }
+        ]
+      })
+    }
+  }
+])
 
 
 /**
