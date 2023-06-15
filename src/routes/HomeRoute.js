@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import Hero from '../components/Hero'
 import RepositoriesTable from '../components/repositories/RepositoriesTable'
 import useRepositories from '../hooks/useRepositories'
@@ -14,6 +15,7 @@ function HomeRoute() {
   return (
     <div>
       <Hero />
+      <Link to='/'>David</Link>
       <div className="container mx-auto py-8 grid grid-cols-1 gap-4 md:grid-cols-2">
         <RepositoriesTable
           label="Most Popular Javascript"

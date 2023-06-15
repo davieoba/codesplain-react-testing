@@ -6,14 +6,13 @@ import HomeRoute from './HomeRoute'
 
 const handlers = [
   rest.get('/api/repositories', (req, res, ctx) => {
-    const query = req.url.searchParams.get('q')
+    const query = req.url.searchParams.get('q').split('language:')[1]
 
-    console.log(query)
-
+    // the actual data in the real repo is about 10, I am just simulating 2
     return res(ctx.json({
       items: [
-        { id: 1, full_name: 'full name' },
-        { id: 2, full_name: 'another name' }
+        { id: 1, full_name: `${query}_one` },
+        { id: 2, full_name: `${query}_two` }
       ]
     }))
   })
@@ -52,7 +51,48 @@ test('renders 2 links for each language', async () => {
     </MemoryRouter>
   )
 
-  // loop over each language and 
+  // await pause()
+  // screen.debug()
+
+  // loop over each language and
+  const languages = [
+    'python',
+    'javascript',
+    'java',
+    'go',
+    'typescript',
+    'rust'
+  ]
+
   // for each language make sure we see 2 links
-  // assert that the links have the appropriate full_name
+  for (let language of languages) {
+    const links = await screen.findAllByRole('link', {
+      name: new RegExp(`${language}_`)
+    })
+
+    // assert that the links have the appropriate
+    expect(links).toHaveLength(2)
+    expect(links[0].textContent).toContain(`${language}_one`)
+    expect(links[1].textContent).toContain(`${language}_two`)
+    expect(links[0]).toHaveAttribute('href', `/repositories/${language}_one`)
+    expect(links[1]).toHaveAttribute('href', `/repositories/${language}_two`)
+  }
+
+  /**
+   * links can make use of the link text content to get the name
+   * also note that paragraph does not have an implicit role, that explains why I cannot grab <p> using 'paragraph' role :: https://stackoverflow.com/a/65123080/9454082
+   */
+  const element = await screen.findByRole('link', {
+    name: 'David'
+  })
+
+  expect(element).toBeInTheDocument()
+
+
+})
+
+// const pause = () => new Promise((resolve) => setTimeout(() => { resolve() }, 1000))
+
+const pause = () => new Promise(resolve => {
+  setTimeout(resolve, 100)
 })
